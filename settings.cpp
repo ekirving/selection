@@ -43,12 +43,12 @@ settings::settings(int argc, char* const argv[]) {
     inputFile = "";
 	mySeed = time(0);
 	output_tsv = 0;
-    a1prop = 2.0;
-    a2prop = 2.0;
+    a1prop = 5.0;
+    a2prop = 5.0;
     ageprop = 20.0;
-    endprop = 5.0;
+    endprop = 2.0;
     timeprop = 0.1;
-    pathprop = 10.0;
+    pathprop = 20.0;
     a1start = 25.0;
     a2start = 50.0;
     set_gen = 0;
