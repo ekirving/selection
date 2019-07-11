@@ -36,181 +36,183 @@ struct compare_index
 
 //builds a bridge from x0 to xt 
 path::path(double x0, double xt, double t0, double t, measure* m, settings& s) {
-	//create the time vector
-	double dt = s.get_dt();
-	int min_steps = s.get_grid();
-	int steps = (t-t0)/dt+1;
-	if (steps < min_steps) {
-		steps = min_steps;
-	}
-	steps += 1;
-	dt = (t-t0)/(steps-1);
-	time.resize(steps);
-	time[0] = t0;
-	for (int i = 1; i < steps; i++) {
-		time[i] = time[i-1] + dt;
-	}
-	time[steps-1] = t; //HACK TO MAKE SURE THAT MACHINE ERROR DOESN'T FUCK ME UP
-	path* temp = m->prop_bridge(x0, xt, t0, t,time);
-	trajectory = temp->get_traj();
-	delete temp;
+    //create the time vector
+    double dt = s.get_dt();
+    int min_steps = s.get_grid();
+    int steps = (t-t0)/dt+1;
+    if (steps < min_steps) {
+        steps = min_steps;
+    }
+    steps += 1;
+    dt = (t-t0)/(steps-1);
+    time.resize(steps);
+    time[0] = t0;
+    for (int i = 1; i < steps; i++) {
+        time[i] = time[i-1] + dt;
+    }
+    time[steps-1] = t; //HACK TO MAKE SURE THAT MACHINE ERROR DOESN'T FUCK ME UP
+    path* temp = m->prop_bridge(x0, xt, t0, t,time);
+    trajectory = temp->get_traj();
+    delete temp;
 }
 
 //builds a bridge from x0 to xt with a fixed time vector
 path::path(double x0, double xt, double t0, double t, measure* m, std::vector<double>& tvec) {
-	time = tvec;
-	path* temp = m->prop_bridge(x0, xt, t0, t,time);
-	trajectory = temp->get_traj();
-	delete temp;
+    time = tvec;
+    path* temp = m->prop_bridge(x0, xt, t0, t,time);
+    trajectory = temp->get_traj();
+    delete temp;
 }
 
 void path::print(std::ostream& o) {
-	int i;
-	o << "trajectory ";
-	for (i = 0; i < trajectory.size(); i++) {
-		o << trajectory[i] << " ";
-	}
-	o << std::endl;
-	o << "time ";
-	for (i = 0; i < trajectory.size(); i++) {
-		o << time[i] << " ";
-	}
-	o << std::endl;
+    int i;
+    o << "trajectory ";
+    for (i = 0; i < trajectory.size(); i++) {
+        o << trajectory[i] << " ";
+    }
+    o << std::endl;
+    o << "time ";
+    for (i = 0; i < trajectory.size(); i++) {
+        o << time[i] << " ";
+    }
+    o << std::endl;
 }
 
 void path::print_tsv(std::ostream& o) {
-	int i;
-	o << "trajectory\ttime" << std::endl ;
-	for (i = 0; i < trajectory.size(); i++) {
-		o << trajectory[i] << "\t" << time[i] << std::endl;
-	}
+    int i;
+    o << "trajectory\ttime" << std::endl ;
+    for (i = 0; i < trajectory.size(); i++) {
+        o << trajectory[i] << "\t" << time[i] << std::endl;
+    }
 }
 
 void path::print_traj(std::ostream& o) {
-	int i;
-	for (i = 0; i < trajectory.size(); i++) {
-		o << trajectory[i] << " ";
-	}
-	o << std::endl;
+    int i;
+    for (i = 0; i < trajectory.size(); i++) {
+        o << trajectory[i] << " ";
+    }
+    o << std::endl;
 }
 
 void path::print_time(std::ostream& o) {
-	int i;
-	for (i = 0; i < time.size(); i++) {
-		o << time[i] << " ";
-	}
-	o << std::endl;
+    int i;
+    for (i = 0; i < time.size(); i++) {
+        o << time[i] << " ";
+    }
+    o << std::endl;
 }
 
 void path::flipCbp() {
-	for (int i = 0; i < trajectory.size(); i++) {
-		trajectory[i] = PI-trajectory[i];
-	}
+    for (int i = 0; i < trajectory.size(); i++) {
+        trajectory[i] = PI-trajectory[i];
+    }
 }
 
 void path::append(path* p) {
-	for (int i = 0; i < p->get_length(); i++) {
-		trajectory.push_back(p->get_traj(i));
-		time.push_back(p->get_time(i));
-	}
+    for (int i = 0; i < p->get_length(); i++) {
+        trajectory.push_back(p->get_traj(i));
+        time.push_back(p->get_time(i));
+    }
 }
 
 void path::append(path* p, int i) {
-	for (int j = i; j < p->get_length(); j++) {
-		trajectory.push_back(p->get_traj(j));
-		time.push_back(p->get_time(j));
-	}
+    for (int j = i; j < p->get_length(); j++) {
+        trajectory.push_back(p->get_traj(j));
+        time.push_back(p->get_time(j));
+    }
 }
 
 void path::insert(path* p, int i) {
-	trajectory.insert(trajectory.begin()+i,p->get_traj_iterator(0),p->get_traj_iterator(p->get_length()));
-	time.insert(time.begin()+i,p->get_time_iterator(0),p->get_time_iterator(p->get_length()));
+    trajectory.insert(trajectory.begin()+i,p->get_traj_iterator(0),p->get_traj_iterator(p->get_length()));
+    time.insert(time.begin()+i,p->get_time_iterator(0),p->get_time_iterator(p->get_length()));
 }
 
 void path::modify(path* p, int i) {
-	if (i != -1 || p != NULL) {
-		old_index = i;
-		int old_length = p->get_length();
-		old_trajectory.resize(0);
-		old_time.resize(0);
+    if (i != -1 || p != NULL) {
+        old_index = i;
+        int old_length = p->get_length();
+        old_trajectory.resize(0);
+        old_time.resize(0);
         //old_trajectory.resize(old_length);
         //old_time.resize(old_length);
-		for (int j = 0; j < old_length; j++) {
-			old_trajectory.push_back(trajectory[i+j]);
+        for (int j = 0; j < old_length; j++) {
+            old_trajectory.push_back(trajectory[i+j]);
             //old_trajectory[j] = trajectory[i+j];
-			trajectory[i+j] = p->get_traj(j);
-			old_time.push_back(time[i+j]);
+            trajectory[i+j] = p->get_traj(j);
+            old_time.push_back(time[i+j]);
             //old_time[j] = time[i+j];
-			time[i+j] = p->get_time(j);
+            time[i+j] = p->get_time(j);
             if (time[i+j] < time[i+j-1]) {
-                std::cout << "ERROR: time vector is not sorted!" << std::endl;
-                std::cout << time[i+j] << " >= " << time[i+j-1] << std::endl;
+                std::cerr << "ERROR: time vector is not sorted!" << std::endl;
+                std::cerr << time[i+j] << " >= " << time[i+j-1] << std::endl;
                 exit(1);
             }
-		}
-        if (trajectory.size() != time.size()) {
-            std::cout << "ERROR: Path trajectory and time are not same lenght!" << std::endl;
-            std::cout << "trajectory.size() = " << trajectory.size() << std::endl;
-            std::cout << "time.size() = " << time.size() << std::endl;
         }
-	} else {
-		old_trajectory.resize(0);
-		old_time.resize(0);
-		old_index = -1;
-	}
+        if (trajectory.size() != time.size()) {
+            std::cerr << "ERROR: Path trajectory and time are not same lenght!" << std::endl;
+            std::cerr << "trajectory.size() = " << trajectory.size() << std::endl;
+            std::cerr << "time.size() = " << time.size() << std::endl;
+            exit(1);
+        }
+    } else {
+        old_trajectory.resize(0);
+        old_time.resize(0);
+        old_index = -1;
+    }
 }
 
 void path::reset() {
-	if (old_index != -1) {
-		for (int j = 0; j < old_trajectory.size(); j++) {
-			trajectory[old_index+j] = old_trajectory[j];
-			time[old_index+j] = old_time[j];
-		}
-	}
+    if (old_index != -1) {
+        for (int j = 0; j < old_trajectory.size(); j++) {
+            trajectory[old_index+j] = old_trajectory[j];
+            time[old_index+j] = old_time[j];
+        }
+    }
     if (trajectory.size() != time.size()) {
-        std::cout << "ERROR: Path trajectory and time are not same lenght!" << std::endl;
-        std::cout << "trajectory.size() = " << trajectory.size() << std::endl;
-        std::cout << "time.size() = " << time.size() << std::endl;
+        std::cerr << "ERROR: Path trajectory and time are not same length!" << std::endl;
+        std::cerr << "trajectory.size() = " << trajectory.size() << std::endl;
+        std::cerr << "time.size() = " << time.size() << std::endl;
+        exit(1);
     }
 }
 
 std::vector<double> path::get_time(int i, int j) {
-	std::vector<double> timeSlice(0,0);
-	for (int k = i; k < j+1; k++) {
-		timeSlice.push_back(time[k]);
-	}
-	return timeSlice;
+    std::vector<double> timeSlice(0,0);
+    for (int k = i; k < j+1; k++) {
+        timeSlice.push_back(time[k]);
+    }
+    return timeSlice;
 }
 
 std::vector<double> path::get_traj(int i, int j) {
-	std::vector<double> trajSlice(0,0);
-	for (int k = i; k < j+1; k++) {
-		trajSlice.push_back(trajectory[k]);
-	}
-	return trajSlice;
+    std::vector<double> trajSlice(0,0);
+    for (int k = i; k < j+1; k++) {
+        trajSlice.push_back(trajectory[k]);
+    }
+    return trajSlice;
 }
 
 path* path::extract_path(int i, int j) {
-	std::vector<double> new_time(0);
-	std::vector<double> new_traj(0);
-	for (int k = i; k < j; k++) {
-		new_time.push_back(time[k]);
-		new_traj.push_back(trajectory[k]);
-	}
-	path* new_path = new path(new_traj,new_time);
-	return new_path;
+    std::vector<double> new_time(0);
+    std::vector<double> new_traj(0);
+    for (int k = i; k < j; k++) {
+        new_time.push_back(time[k]);
+        new_traj.push_back(trajectory[k]);
+    }
+    path* new_path = new path(new_traj,new_time);
+    return new_path;
 }
 
 std::vector<double> wfSamplePath::parse_comma_sep(char* c) {
-	std::vector<double> pars(0);
-	std::string string_pars(c);
-	std::istringstream stringstream_pars(string_pars);
-	std::string cur_par;
-	
-	while (std::getline(stringstream_pars,cur_par,',')) {
-		pars.push_back(atof(cur_par.c_str()));
-	}
-	return pars;
+    std::vector<double> pars(0);
+    std::string string_pars(c);
+    std::istringstream stringstream_pars(string_pars);
+    std::string cur_par;
+
+    while (std::getline(stringstream_pars,cur_par,',')) {
+        pars.push_back(atof(cur_par.c_str()));
+    }
+    return pars;
 }
 
 
@@ -243,20 +245,20 @@ double wfSamplePath::sampleProb(int k, int n, double y) {
 }
 
 double wfSamplePath::sampleProb(int i) {
-	int idx = sample_time_vec[i]->get_idx();
+    int idx = sample_time_vec[i]->get_idx();
     double sc = sample_time_vec[i]->get_sc();
     double ss = sample_time_vec[i]->get_ss();
-	double sp = 0;
-	if (idx != -1 && idx != 0) {
+    double sp = 0;
+    if (idx != -1 && idx != 0) {
         sp += sampleProb(sc,ss,trajectory[idx]);
-	} else {
-		if (sc == 0) {
-			sp += 0;
-		} else {
-			sp += -INFINITY;
-		}
-	}
-	return sp;
+    } else {
+        if (sc == 0) {
+            sp += 0;
+        } else {
+            sp += -INFINITY;
+        }
+    }
+    return sp;
 }
 
 double wfSamplePath::ascertainModern(int min) {
@@ -292,19 +294,19 @@ double wfSamplePath::ascertainAncient() {
 }
 
 std::vector<double> wfSamplePath::sampleProb() {
-	std::vector<double> sp(0);
-	for (int i = 0; i < sample_time_vec.size(); i++) {
-		sp.push_back(sampleProb(i));
-	}
-	return sp;
+    std::vector<double> sp(0);
+    for (int i = 0; i < sample_time_vec.size(); i++) {
+        sp.push_back(sampleProb(i));
+    }
+    return sp;
 }
 
 void wfSamplePath::print_traj(std::ostream& o) {
-	int i;
-	for (i = 0; i < trajectory.size(); i++) {
-		o << (1.0-cos(trajectory[i]))/2.0 << " ";
-	}
-	o << std::endl;
+    int i;
+    for (i = 0; i < trajectory.size(); i++) {
+        o << (1.0-cos(trajectory[i]))/2.0 << " ";
+    }
+    o << std::endl;
 }
 
 wfSamplePath::wfSamplePath(std::vector<sample_time*>& st, popsize* p, wfMeasure* wf, settings& s, MbRandom* r) : path() {
@@ -340,7 +342,7 @@ wfSamplePath::wfSamplePath(std::vector<sample_time*>& st, popsize* p, wfMeasure*
     
     double max_time = breakPoints[*std::max_element(breakPoints.begin(), breakPoints.end())];
     
-    std::vector<double> curBreaks = myPop->getBreakTimes(first_nonzero, max_time);
+    std::vector<double> curBreaks = myPop->getBreakTimes(max_time, first_nonzero);
     
     for (int i = 0; i < curBreaks.size(); i++) {
         breakPoints.push_back(curBreaks[i]);
@@ -415,25 +417,25 @@ wfSamplePath::wfSamplePath(std::vector<sample_time*>& st, popsize* p, wfMeasure*
 
 
 wfSamplePath::~wfSamplePath() {
-	delete myPop;
+    delete myPop;
 }
 
 void wfSamplePath::set_allele_age(double a, path* p, int i) {
     int oldLength = time.size();
     double endTimeUpdate = p->get_time(p->get_length()-1);
-	old_age = allele_age;
-	allele_age = a;
-	old_begin_traj = this->get_traj(0,i);
-	old_begin_time = this->get_time(0,i);
-	std::vector<double> tempTraj = p->get_traj();
-	std::vector<double> tempTime = p->get_time();
-	old_index = tempTime.size() - 1; 
-	for (int j = i+1; j < trajectory.size(); j++) {
-		tempTraj.push_back(trajectory[j]);
-		tempTime.push_back(time[j]);
-	}
-	trajectory = tempTraj;
-	time = tempTime;
+    old_age = allele_age;
+    allele_age = a;
+    old_begin_traj = this->get_traj(0,i);
+    old_begin_time = this->get_time(0,i);
+    std::vector<double> tempTraj = p->get_traj();
+    std::vector<double> tempTime = p->get_time();
+    old_index = tempTime.size() - 1;
+    for (int j = i+1; j < trajectory.size(); j++) {
+        tempTraj.push_back(trajectory[j]);
+        tempTime.push_back(time[j]);
+    }
+    trajectory = tempTraj;
+    time = tempTime;
     int newLength = time.size();
     int lengthDif = newLength - oldLength;
     
@@ -448,7 +450,8 @@ void wfSamplePath::set_allele_age(double a, path* p, int i) {
             //if it's part of the new trajectory, find where it is
             search_it = std::lower_bound(time.begin(),time.end(),sample_time_vec[j]->get());
             if (search_it == time.end() && sample_time_vec[j]->get() != time[time.size()-1]) {
-                std::cout << "ERROR: could not find sample time index " << j << " with value " << sample_time_vec[j]->get() << " in time vector!" << std::endl;
+                std::cerr << "ERROR: could not find sample time index " << j << " with value " << sample_time_vec[j]->get() << " in time vector!" << std::endl;
+                exit(1);
             }
             new_idx = search_it-time.begin();
             sample_time_vec[j]->set_idx(new_idx);
@@ -466,11 +469,11 @@ void wfSamplePath::set_allele_age(double a, path* p, int i) {
 void wfSamplePath::resetIntermediate() {
     //check some things
     if (update_begin) {
-        std::cout << std::endl << "ERROR: Trying to reset an intermediate part of the path, but allele age was updated!" << std::endl;
+        std::cerr << "ERROR: Trying to reset an intermediate part of the path, but allele age was updated!" << std::endl;
         exit(1);
     }
     if (old_index == -1) {
-        std::cout << std::endl << "ERROR: Trying to reset an intermdiate part of the path, but old_index = -1!" << std::endl;
+        std::cerr << "ERROR: Trying to reset an intermdiate part of the path, but old_index = -1!" << std::endl;
         exit(1);
     }
     //replace the trajectory
@@ -484,7 +487,7 @@ void wfSamplePath::resetIntermediate() {
 void wfSamplePath::resetBeginning() {
     //check some things
     if (!update_begin) {
-        std::cout << std::endl << "ERROR: Trying to reset the beginning of the path, but allele age wasn't updated!" << std::endl;
+        std::cerr << "ERROR: Trying to reset the beginning of the path, but allele age wasn't updated!" << std::endl;
         exit(1);
     }
     
@@ -554,9 +557,9 @@ void wfSamplePath::updateFirstNonzero() {
 }
 
 void path::replace_time(std::vector<double> new_time) {
-	if (new_time.size() != time.size()) {
-		std::cout << "ERROR: Trying to replace a time vector with one of a different size!" << std::endl;
-		exit(1);
-	}
-	time = new_time;
+    if (new_time.size() != time.size()) {
+        std::cerr << "ERROR: Trying to replace a time vector with one of a different size!" << std::endl;
+        exit(1);
+    }
+    time = new_time;
 }
