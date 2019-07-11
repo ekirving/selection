@@ -37,12 +37,12 @@ public:
 	
 	//element access
 	std::vector<double> get_traj() {return trajectory;};
-	double get_traj(int i) {return trajectory[i];};
+	double get_traj(int i) {return trajectory.at(i);};
 	std::vector<double> get_traj(int i, int j);
-	void set_traj(double x, int i) {trajectory[i] = x;};
+	void set_traj(double x, int i) {trajectory.at(i) = x;};
 	std::vector<double> get_time() {return time;};
     std::vector<double>& get_time_ref() {return time;};
-	double get_time(int i) {return time[i];};
+	double get_time(int i) {return time.at(i);};
 	std::vector<double> get_time(int i, int j);
 	double get_length() {return trajectory.size();};
     double get_length_time() {return time.size();};

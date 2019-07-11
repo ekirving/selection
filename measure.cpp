@@ -187,9 +187,6 @@ double cbpMeasure::log_girsanov_wf_r(path* p, double alpha1, double alpha2, pops
 	double int_mderiv = 0;
 	i = 0;
 	for (j = 0; j < dconts.size()-1; j++) {
-        if (i >= p->get_length()) { //THIS IS A FUCKING HACK
-            break;
-        }
 		//get the potentials while I'm at it.
 		//first the "beginning" potential 
 		Hm_w0 += H_wf_r(p->get_traj(i), p->get_time(i), alpha1, alpha2, rho);
@@ -220,9 +217,6 @@ double cbpMeasure::log_girsanov_wf_r(path* p, double alpha1, double alpha2, pops
 	double int_msquare = 0;
 	i = 1;
 	for (j = 0; j < dconts.size()-1; j++) {
-        if (i == p->get_length()) { //THIS IS A FUCKING HACK
-            break;
-        }
 		//integrate over the interval using the trapezoid rule
 		while (p->get_time(i) < dconts[j+1]) {
 			int_msquare += (a2_wf_r(p->get_traj(i),p->get_time(i),alpha1,alpha2,rho)+a2_wf_r(p->get_traj(i-1),p->get_time(i-1),alpha1,alpha2,rho))/2.0
@@ -249,9 +243,6 @@ double cbpMeasure::log_girsanov_wf_r(path* p, double alpha1, double alpha2, pops
 	double int_mtime = 0;
 	i = 1;
 	for (j = 0; j < dconts.size()-1; j++) {
-        if (i == p->get_length()) { //THIS IS A FUCKING HACK
-            break;
-        }
 		//integrate over the interval using the trapezoid rule
 		while (p->get_time(i) < dconts[j+1]) {
 			int_mtime += (dHdt_wf_r(p->get_traj(i),p->get_time(i),alpha1,alpha2,rho)+dHdt_wf_r(p->get_traj(i-1),p->get_time(i-1),alpha1,alpha2,rho))/2.0
@@ -331,9 +322,6 @@ double cbpMeasure::log_girsanov_wfwf_r(path* p, double alpha1, double alpha1p, d
 	double int_mderiv = 0;
 	i = 0;
 	for (j = 0; j < dconts.size()-1; j++) {
-        if (i >= p->get_length()) { //THIS IS A FUCKING HACK
-            break;
-        }
 		//get the potentials while I'm at it.
 		//first the "beginning" potential 
 		Hm_w0 += H_wfwf_r(p->get_traj(i), p->get_time(i), alpha1, alpha1p, alpha2, alpha2p, rho);
@@ -359,9 +347,6 @@ double cbpMeasure::log_girsanov_wfwf_r(path* p, double alpha1, double alpha1p, d
 	double int_msquare = 0;
 	i = 1;
 	for (j = 0; j < dconts.size()-1; j++) {
-        if (i == p->get_length()) { //THIS IS A FUCKING HACK
-            break;
-        }
 		//integrate over the interval using the trapezoid rule
 		while (p->get_time(i) < dconts[j+1]) {
 			int_msquare += (a2_wfwf_r(p->get_traj(i),p->get_time(i),alpha1,alpha1p,alpha2,alpha2p,rho)+a2_wfwf_r(p->get_traj(i-1),p->get_time(i-1),alpha1,alpha1p,alpha2,alpha2p,rho))/2.0
@@ -377,9 +362,6 @@ double cbpMeasure::log_girsanov_wfwf_r(path* p, double alpha1, double alpha1p, d
 	double int_mtime = 0;
 	i = 1;
 	for (j = 0; j < dconts.size()-1; j++) {
-        if (i == p->get_length()) { //THIS IS A FUCKING HACK
-            break;
-        }
 		//integrate over the interval using the trapezoid rule
 		while (p->get_time(i) < dconts[j+1]) {
 			int_mtime += (dHdt_wfwf_r(p->get_traj(i),p->get_time(i),alpha1,alpha1p,alpha2,alpha2p,rho)+dHdt_wfwf_r(p->get_traj(i-1),p->get_time(i-1),alpha1,alpha1p,alpha2,alpha2p,rho))/2.0
