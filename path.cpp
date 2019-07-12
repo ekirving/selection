@@ -143,15 +143,16 @@ void path::modify(path* p, int i) {
             //old_time[j] = time[i+j];
 			time[i+j] = p->get_time(j);
             if (time[i+j] < time[i+j-1]) {
-                std::cout << "ERROR: time vector is not sorted!" << std::endl;
-                std::cout << time[i+j] << " >= " << time[i+j-1] << std::endl;
+                std::cerr << "ERROR: time vector is not sorted!" << std::endl;
+                std::cerr << time[i+j] << " >= " << time[i+j-1] << std::endl;
                 exit(1);
             }
 		}
         if (trajectory.size() != time.size()) {
-            std::cout << "ERROR: Path trajectory and time are not same lenght!" << std::endl;
-            std::cout << "trajectory.size() = " << trajectory.size() << std::endl;
-            std::cout << "time.size() = " << time.size() << std::endl;
+            std::cerr << "ERROR: Path trajectory and time are not same lenght!" << std::endl;
+            std::cerr << "trajectory.size() = " << trajectory.size() << std::endl;
+            std::cerr << "time.size() = " << time.size() << std::endl;
+            exit(1);
         }
 	} else {
 		old_trajectory.resize(0);
@@ -168,9 +169,10 @@ void path::reset() {
 		}
 	}
     if (trajectory.size() != time.size()) {
-        std::cout << "ERROR: Path trajectory and time are not same lenght!" << std::endl;
-        std::cout << "trajectory.size() = " << trajectory.size() << std::endl;
-        std::cout << "time.size() = " << time.size() << std::endl;
+        std::cerr << "ERROR: Path trajectory and time are not same length!" << std::endl;
+        std::cerr << "trajectory.size() = " << trajectory.size() << std::endl;
+        std::cerr << "time.size() = " << time.size() << std::endl;
+        exit(1);
     }
 }
 
@@ -448,7 +450,8 @@ void wfSamplePath::set_allele_age(double a, path* p, int i) {
             //if it's part of the new trajectory, find where it is
             search_it = std::lower_bound(time.begin(),time.end(),sample_time_vec[j]->get());
             if (search_it == time.end() && sample_time_vec[j]->get() != time[time.size()-1]) {
-                std::cout << "ERROR: could not find sample time index " << j << " with value " << sample_time_vec[j]->get() << " in time vector!" << std::endl;
+                std::cerr << "ERROR: could not find sample time index " << j << " with value " << sample_time_vec[j]->get() << " in time vector!" << std::endl;
+                exit(1);
             }
             new_idx = search_it-time.begin();
             sample_time_vec[j]->set_idx(new_idx);
@@ -466,11 +469,11 @@ void wfSamplePath::set_allele_age(double a, path* p, int i) {
 void wfSamplePath::resetIntermediate() {
     //check some things
     if (update_begin) {
-        std::cout << std::endl << "ERROR: Trying to reset an intermediate part of the path, but allele age was updated!" << std::endl;
+        std::cerr << "ERROR: Trying to reset an intermediate part of the path, but allele age was updated!" << std::endl;
         exit(1);
     }
     if (old_index == -1) {
-        std::cout << std::endl << "ERROR: Trying to reset an intermdiate part of the path, but old_index = -1!" << std::endl;
+        std::cerr << "ERROR: Trying to reset an intermdiate part of the path, but old_index = -1!" << std::endl;
         exit(1);
     }
     //replace the trajectory
@@ -484,7 +487,7 @@ void wfSamplePath::resetIntermediate() {
 void wfSamplePath::resetBeginning() {
     //check some things
     if (!update_begin) {
-        std::cout << std::endl << "ERROR: Trying to reset the beginning of the path, but allele age wasn't updated!" << std::endl;
+        std::cerr << "ERROR: Trying to reset the beginning of the path, but allele age wasn't updated!" << std::endl;
         exit(1);
     }
     
@@ -555,7 +558,7 @@ void wfSamplePath::updateFirstNonzero() {
 
 void path::replace_time(std::vector<double> new_time) {
 	if (new_time.size() != time.size()) {
-		std::cout << "ERROR: Trying to replace a time vector with one of a different size!" << std::endl;
+		std::cerr << "ERROR: Trying to replace a time vector with one of a different size!" << std::endl;
 		exit(1);
 	}
 	time = new_time;

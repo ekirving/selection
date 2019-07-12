@@ -92,7 +92,7 @@ void mcmc::no_linked_sites(settings& mySettings) {
     for (int i = 0; i < sample_time_vec.size()-1; i++) {
         if (sample_time_vec[i]->get_oldest() < sample_time_vec[i]->get_youngest()) {
             if (!mySettings.get_infer_age()) {
-                std::cout << "ERROR: Cannot have uncertain times without inferring allele age. Will be fixed in the future" << std::endl;
+                std::cerr << "ERROR: Cannot have uncertain times without inferring allele age. Will be fixed in the future" << std::endl;
                 exit(1);
             }
             sample_time_vec[i]->set_path(curParamPath);
@@ -183,13 +183,13 @@ void mcmc::no_linked_sites(settings& mySettings) {
 		
 		double LLRatio = curlnL-oldlnL;
         if (curlnL != curlnL || oldlnL != oldlnL) {
-            std::cout << "ERROR: likelihood is nan!" << std::endl;
-            std::cout << "Generation = " << gen << std::endl;
-            std::cout << "Proposal = " << curProp << std::endl;
-            std::cout << "curlnL = " << curlnL << ", oldlnL = " << oldlnL << std::endl;
+            std::cerr << "ERROR: likelihood is nan!" << std::endl;
+            std::cerr << "Generation = " << gen << std::endl;
+            std::cerr << "Proposal = " << curProp << std::endl;
+            std::cerr << "curlnL = " << curlnL << ", oldlnL = " << oldlnL << std::endl;
             curPath->print();
             for (int t = 0; t < sample_time_vec.size(); t++) {
-                std::cout << sample_time_vec[t]->get() << std::endl;
+                std::cerr << sample_time_vec[t]->get() << std::endl;
             }
             exit(1);
         }
@@ -243,10 +243,10 @@ void mcmc::no_linked_sites(settings& mySettings) {
             if (curIdx != -1) {
                 double curTimePath = curPath->get_time(curIdx);
                 if (curTime != curTimePath && curIdx != -1) {
-                    std::cout << "ERROR: sample time index for time " << i << " is lost!" << std::endl;
-                    std::cout << "curTime = " << curTime << std::endl;
-                    std::cout << "curIdx = " << curIdx << std::endl;
-                    std::cout << "curTimePath = " << curTimePath << std::endl;
+                    std::cerr << "ERROR: sample time index for time " << i << " is lost!" << std::endl;
+                    std::cerr << "curTime = " << curTime << std::endl;
+                    std::cerr << "curIdx = " << curIdx << std::endl;
+                    std::cerr << "curTimePath = " << curTimePath << std::endl;
                     exit(1);
                 }
             }
@@ -290,9 +290,9 @@ double mcmc::compute_lnL(wfSamplePath* p, measure* m, wienerMeasure* wm) {
 	}
 	
 	if (gir != gir) {
-		std::cout << "Likelihood is nan at generation " << gen << ". Proposal " << curProp << std::endl;
-		p->print_traj(std::cout);
-		p->print_time(std::cout);
+		std::cerr << "ERROR: Likelihood is nan at generation " << gen << ". Proposal " << curProp << std::endl;
+		p->print_traj(std::cerr);
+		p->print_time(std::cerr);
 		exit(1);
 	}
 	return gir + sample_prob;

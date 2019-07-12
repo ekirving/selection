@@ -257,8 +257,9 @@ double cbpMeasure::log_girsanov_wf_r(path* p, double alpha1, double alpha2, pops
 	if (!is_bridge) {
         double gir = (Hm_wt-Hm_w0-1.0/2.0*int_mderiv-1.0/2.0*int_msquare-int_mtime);
         if (gir != gir) {
-            std::cout << "ERROR: log_girsanov_wf_r is nan" << std::endl;
-            std::cout << "Hm_wt = " << Hm_wt << " Hm_w0 = " << Hm_w0 << " int_mderiv = " << int_mderiv << " int_msquare = " << int_msquare << " int_mtime = " << int_mtime << std::endl;
+            std::cerr << "ERROR: log_girsanov_wf_r is nan" << std::endl;
+            std::cerr << "Hm_wt = " << Hm_wt << " Hm_w0 = " << Hm_w0 << " int_mderiv = " << int_mderiv << " int_msquare = " << int_msquare << " int_mtime = " << int_mtime << std::endl;
+            exit(1);
         }
         return gir;
 	} else {
@@ -376,8 +377,9 @@ double cbpMeasure::log_girsanov_wfwf_r(path* p, double alpha1, double alpha1p, d
     double gir = Hm_wt-Hm_w0-1.0/2.0*int_mderiv-1.0/2.0*int_msquare-int_mtime;
     
     if (gir != gir) {
-        std::cout << "ERROR: log_girsanov_wfwf_r is nan" << std::endl;
-        std::cout << "Hm_wt = " << Hm_wt << " Hm_w0 = " << Hm_w0 << " int_mderiv = " << int_mderiv << " int_msquare = " << int_msquare << " int_mtime = " << int_mtime << std::endl;
+        std::cerr << "ERROR: log_girsanov_wfwf_r is nan" << std::endl;
+        std::cerr << "Hm_wt = " << Hm_wt << " Hm_w0 = " << Hm_w0 << " int_mderiv = " << int_mderiv << " int_msquare = " << int_msquare << " int_mtime = " << int_mtime << std::endl;
+        exit(1);
     }
 	
 	return gir;
@@ -504,11 +506,12 @@ path* cbpMeasure::prop_bridge(double x0, double xt, double t0, double t, std::ve
 		for (i = 0; i < 4; i++) {
 			b4_traj[j] += pow(bb_paths[i]->get_traj(j),2);
 			if (b4_traj[j] != b4_traj[j]) {
-                std::cout << "Failing to propose a BES4 bridge from " << x0 << " to " << xt << " during time interval (" << t0 << ", " << t << ")" << std::endl;
-                std::cout << "This likely means that the time vector is getting loopy, possibly due to pileup of points" << std::endl;
-                std::cout << "The " << i << "th Brownian bridge between " << u[i] << " and " << xt*v[i] << " is faulty:" << std::endl;
-				bb_paths[i]->print_traj(std::cout);
-				bb_paths[i]->print_time(std::cout << std::setprecision(20));
+                std::cerr << "ERROR: Failing to propose a BES4 bridge from " << x0 << " to " << xt << " during time interval (" << t0 << ", " << t << ")" << std::endl;
+                std::cerr << "This likely means that the time vector is getting loopy, possibly due to pileup of points" << std::endl;
+                std::cerr << "The " << i << "th Brownian bridge between " << u[i] << " and " << xt*v[i] << " is faulty:" << std::endl;
+				bb_paths[i]->print_traj(std::cerr);
+				bb_paths[i]->print_time(std::cerr << std::setprecision(20));
+				exit(1);
 			}
 		}
 		b4_traj[j] = sqrt(b4_traj[j]);
@@ -566,7 +569,7 @@ path* wfMeasure::prop_bridge(double x0, double xt, double t0, double t, std::vec
 		gir = cbp->log_girsanov_wf(test_path, 0, 0);
 		accept_prob = rescale + gir;
 		if (accept_prob > 0) {
-			std::cerr << "Envelope is not sufficient" << std::endl;
+			std::cerr << "ERROR: Envelope is not sufficient" << std::endl;
 			exit(1);
 		}
 		u = random->uniformRv();

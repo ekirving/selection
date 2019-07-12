@@ -194,18 +194,18 @@ double sample_time::propose() {
     //NEW: refelcted uniform
     double propRatio = 0;
     if (curVal > youngest || curVal < oldest) {
-        std::cout << "ERROR: sample_time proposal is outside of range" << std::endl;
-        std::cout << "oldest = " << oldest << ", youngest = " << youngest << std::endl;
-        std::cout << "Allele age = " << curParamPath->get_path()->get_time(0) << std::endl;
-        std::cout << "oldVal = " << oldVal << ", curVal = " << curVal << std::endl;
-        std::cout << "Starting curVal = " << startVal << std::endl;
-        std::cout << "Final curVal = " << curVal << std::endl;
-        std::cout << "old_idx = " << old_idx << ", cur_idx = " << cur_idx << std::endl;
-        std::cout << "path->time(old_idx) = " << curParamPath->get_path()->get_time(old_idx) << std::endl;
-        std::cout << "path->time(cur_idx) = " << curParamPath->get_path()->get_time(cur_idx) << std::endl;
-        std::cout << "propRatio = " << propRatio << std::endl;
+        std::cerr << "ERROR: sample_time proposal is outside of range" << std::endl;
+        std::cerr << "oldest = " << oldest << ", youngest = " << youngest << std::endl;
+        std::cerr << "Allele age = " << curParamPath->get_path()->get_time(0) << std::endl;
+        std::cerr << "oldVal = " << oldVal << ", curVal = " << curVal << std::endl;
+        std::cerr << "Starting curVal = " << startVal << std::endl;
+        std::cerr << "Final curVal = " << curVal << std::endl;
+        std::cerr << "old_idx = " << old_idx << ", cur_idx = " << cur_idx << std::endl;
+        std::cerr << "path->time(old_idx) = " << curParamPath->get_path()->get_time(old_idx) << std::endl;
+        std::cerr << "path->time(cur_idx) = " << curParamPath->get_path()->get_time(cur_idx) << std::endl;
+        std::cerr << "propRatio = " << propRatio << std::endl;
         //std::cin.ignore();
-        //exit(1);
+        exit(1);
     }
     return propRatio;
 }
@@ -232,10 +232,11 @@ double param_age::propose() {
     //curVal = reflectedUniform(oldVal, tuning, -INFINITY, topTime);
     //double propRatio = 0;
 	if (propRatio != propRatio) {
-		std::cout << "ERROR: Proposal ratio is nan! Debugging information:" << std::endl;
-		std::cout << "oldVal: " << oldVal << " curVal: " << curVal << " tuning " << tuning << std::endl;
-		std::cout << "log(P(theta | theta')) = " << log(random->truncatedHalfNormalPdf(topTime, 0, curVal, tuning, oldVal)) << std::endl;
-		std::cout << "log(P(theta' | theta)) = " << log(random->truncatedHalfNormalPdf(topTime, 0, oldVal, tuning, curVal)) << std::endl;
+		std::cerr << "ERROR: Proposal ratio is nan! Debugging information:" << std::endl;
+		std::cerr << "oldVal: " << oldVal << " curVal: " << curVal << " tuning " << tuning << std::endl;
+		std::cerr << "log(P(theta | theta')) = " << log(random->truncatedHalfNormalPdf(topTime, 0, curVal, tuning, oldVal)) << std::endl;
+		std::cerr << "log(P(theta' | theta)) = " << log(random->truncatedHalfNormalPdf(topTime, 0, oldVal, tuning, curVal)) << std::endl;
+        exit(1);
 	}
 	propRatio += curParamPath->proposeAlleleAge(curVal, oldVal);
 	return propRatio;
@@ -306,9 +307,9 @@ double param_path::proposeAlleleAge(double newAge, double oldAge) {
             end_index += 2*minUpdate;
         }
         if (end_index > curPath->get_length()) {
-            std::cout << "ERROR: trying to update allele age path past the end of the path!" << std::endl;
-            std::cout << "path length = " << curPath->get_length() << ", end_index = " << end_index << std::endl;
-            std::cout << "newAge = " << newAge << std::endl;
+            std::cerr << "ERROR: trying to update allele age path past the end of the path!" << std::endl;
+            std::cerr << "path length = " << curPath->get_length() << ", end_index = " << end_index << std::endl;
+            std::cerr << "newAge = " << newAge << std::endl;
             curPath->print_time();
             exit(1);
         }
@@ -363,11 +364,11 @@ std::vector<double> param_path::make_time_vector(double newAge, int end_index, p
     
 //    for (int j = 0; j < timesToInclude.size()-1; j++) {
 //        if (!(timesToInclude[j+1]>(timesToInclude[j]+std::numeric_limits<double>::epsilon()))) {
-//            std::cout << "ERROR: Times to include isn't strictly increasing!" << std::endl;
+//            std::cerr << "ERROR: Times to include isn't strictly increasing!" << std::endl;
 //            for (int l = 0; l < timesToInclude.size(); l++) {
-//                std::cout << timesToInclude[l] << " ";
+//                std::cerr << timesToInclude[l] << " ";
 //            }
-//            std::cout << std::endl;
+//            std::cerr << std::endl;
 //            exit(1);
 //        }
 //    }
@@ -398,25 +399,25 @@ std::vector<double> param_path::make_time_vector(double newAge, int end_index, p
         }
 	}
     
-    //check that time vector is strictly increasing
+//    //check that time vector is strictly increasing
 //    for (int j = 0; j < newTimes.size()-1; j++) {
 //        if (!(newTimes[j+1]>newTimes[j])) {
-//            std::cout << "ERROR: new time vector of length " << newTimes.size() << "  not strictly increasing" << std::endl;
-//            std::cout << "Machine eps is " << std::numeric_limits<double>::epsilon() << std::endl;
-//            std::cout << "Times to include are" << std::endl;
+//            std::cerr << "ERROR: new time vector of length " << newTimes.size() << "  not strictly increasing" << std::endl;
+//            std::cerr << "Machine eps is " << std::numeric_limits<double>::epsilon() << std::endl;
+//            std::cerr << "Times to include are" << std::endl;
 //            for (int l = 0; l < timesToInclude.size(); l++) {
-//                std::cout << timesToInclude[l] << " ";
+//                std::cerr << timesToInclude[l] << " ";
 //            }
-//            std::cout << std::endl;
+//            std::cerr << std::endl;
 //            for (int l = 0; l < timesToInclude.size() - 1; l++) {
-//                std::cout << timesToInclude[l+1] << " - " << timesToInclude[l] << " = " << timesToInclude[l+1] - timesToInclude[l] << " ";
+//                std::cerr << timesToInclude[l+1] << " - " << timesToInclude[l] << " = " << timesToInclude[l+1] - timesToInclude[l] << " ";
 //            }
-//            std::cout << std::endl;
+//            std::cerr << std::endl;
 //            for (int l = 0; l < timesToInclude.size() - 1; l++) {
-//                std::cout << (timesToInclude[l+1]>timesToInclude[l]) << " ";
+//                std::cerr << (timesToInclude[l+1]>timesToInclude[l]) << " ";
 //            }
-//            std::cout << std::endl;
-//            std::cout << "newTimes[" << j << "+1] = " << newTimes[j+1] << ", newTimes[" << j << "] = " << newTimes[j] << std::endl;
+//            std::cerr << std::endl;
+//            std::cerr << "newTimes[" << j << "+1] = " << newTimes[j+1] << ", newTimes[" << j << "] = " << newTimes[j] << std::endl;
 //            exit(1);
 //        }
 //    }
