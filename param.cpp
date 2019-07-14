@@ -231,8 +231,8 @@ double param_age::propose() {
     //NEW: reflected uniform
     //curVal = reflectedUniform(oldVal, tuning, -INFINITY, topTime);
     //double propRatio = 0;
-	if (propRatio != propRatio) {
-		std::cerr << "ERROR: Proposal ratio is nan! Debugging information:" << std::endl;
+	if (isnan(propRatio)) {
+		std::cerr << "ERROR: Proposal ratio is NaN! Debugging information:" << std::endl;
 		std::cerr << "oldVal: " << oldVal << " curVal: " << curVal << " tuning " << tuning << std::endl;
 		std::cerr << "log(P(theta | theta')) = " << log(random->truncatedHalfNormalPdf(topTime, 0, curVal, tuning, oldVal)) << std::endl;
 		std::cerr << "log(P(theta' | theta)) = " << log(random->truncatedHalfNormalPdf(topTime, 0, oldVal, tuning, curVal)) << std::endl;
@@ -501,8 +501,8 @@ double param_path::proposeAgePath(double x0,double xt,double t0,double t, std::v
     
     double new_like = myCBP.log_girsanov_wf_r(newPath, a1->get(), a2->get(), rho,0);
     
-    if (new_like != new_like) {
-        std::cerr << "ERROR: new path likelihood is nan! Debugging information sent to stderr:" << std::endl;
+    if (isnan(new_like)) {
+        std::cerr << "ERROR: new path likelihood is NaN! Debugging information sent to stderr:" << std::endl;
         std::cerr << "New path:" << std::endl;
         std::cerr << "alpha1 = " << a1->get() << " alpha2 = " << a2->get() << std::endl;
         newPath->print_traj(std::cerr);
@@ -513,8 +513,8 @@ double param_path::proposeAgePath(double x0,double xt,double t0,double t, std::v
     
     double old_like = myCBP.log_girsanov_wf_r(oldPath, a1->get(), a2->get(), rho,0);
     
-    if (old_like != old_like) {
-        std::cerr << "ERROR: old path likelihood is nan! Debugging information sent to stderr:" << std::endl;
+    if (isnan(old_like)) {
+        std::cerr << "ERROR: old path likelihood is NaN! Debugging information sent to stderr:" << std::endl;
         std::cerr << "alpha1 = " << a1->get() << " alpha2 = " << a2->get() << std::endl;
         std::cerr << "Old path:" << std::endl;
         oldPath->print_traj(std::cerr);
@@ -527,8 +527,8 @@ double param_path::proposeAgePath(double x0,double xt,double t0,double t, std::v
 	
 	propRatio += -1.0/2.0*xt*xt*(1.0/tNew-1.0/tOld)+2*log(tOld)-2*log(tNew);
 	
-	if (propRatio != propRatio) {
-		std::cerr << "ERROR: proposal ratio is nan! Debugging information sent to stderr:" << std::endl;
+	if (isnan(propRatio)) {
+		std::cerr << "ERROR: proposal ratio is NaN! Debugging information sent to stderr:" << std::endl;
 		std::cerr << "New path:" << std::endl;
 		newPath->print_traj(std::cerr);
 		newPath->print_time(std::cerr);

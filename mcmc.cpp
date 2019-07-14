@@ -182,8 +182,8 @@ void mcmc::no_linked_sites(settings& mySettings) {
 		curlnL = compute_lnL_sample_only(curPath);
 		
 		double LLRatio = curlnL-oldlnL;
-        if (curlnL != curlnL || oldlnL != oldlnL) {
-            std::cerr << "ERROR: likelihood is nan!" << std::endl;
+        if (isnan(curlnL) || isnan(oldlnL)) {
+            std::cerr << "ERROR: likelihood is NaN!" << std::endl;
             std::cerr << "Generation = " << gen << std::endl;
             std::cerr << "Proposal = " << curProp << std::endl;
             std::cerr << "curlnL = " << curlnL << ", oldlnL = " << oldlnL << std::endl;
@@ -289,8 +289,8 @@ double mcmc::compute_lnL(wfSamplePath* p, measure* m, wienerMeasure* wm) {
 		sample_prob += p->sampleProb(i);
 	}
 	
-	if (gir != gir) {
-		std::cerr << "ERROR: Likelihood is nan at generation " << gen << ". Proposal " << curProp << std::endl;
+	if (isnan(gir)) {
+		std::cerr << "ERROR: Likelihood is NaN at generation " << gen << ". Proposal " << curProp << std::endl;
 		p->print_traj(std::cerr);
 		p->print_time(std::cerr);
 		exit(1);

@@ -206,8 +206,8 @@ double cbpMeasure::log_girsanov_wf_r(path* p, double alpha1, double alpha2, pops
 		* (p->get_time(i)-p->get_time(i-1));
 		//then the "end" potential
         double tmp = H_wf_r(p->get_traj(i), p->get_time(i), alpha1, alpha2, rho, 1);
-        if (tmp != tmp) {
-            std::cout << "computation of H_wf_r is nan" << std::endl;
+        if (isnan(tmp)) {
+            std::cout << "computation of H_wf_r is NaN" << std::endl;
             std::cout << "p->get_length() = " << p->get_length() << " i = " << i << " j = " << j << std::endl;
         }
         Hm_wt += tmp;
@@ -256,8 +256,8 @@ double cbpMeasure::log_girsanov_wf_r(path* p, double alpha1, double alpha2, pops
 	
 	if (!is_bridge) {
         double gir = (Hm_wt-Hm_w0-1.0/2.0*int_mderiv-1.0/2.0*int_msquare-int_mtime);
-        if (gir != gir) {
-            std::cerr << "ERROR: log_girsanov_wf_r is nan" << std::endl;
+        if (isnan(gir)) {
+            std::cerr << "ERROR: log_girsanov_wf_r is NaN" << std::endl;
             std::cerr << "Hm_wt = " << Hm_wt << " Hm_w0 = " << Hm_w0 << " int_mderiv = " << int_mderiv << " int_msquare = " << int_msquare << " int_mtime = " << int_mtime << std::endl;
             exit(1);
         }
@@ -376,8 +376,8 @@ double cbpMeasure::log_girsanov_wfwf_r(path* p, double alpha1, double alpha1p, d
 	
     double gir = Hm_wt-Hm_w0-1.0/2.0*int_mderiv-1.0/2.0*int_msquare-int_mtime;
     
-    if (gir != gir) {
-        std::cerr << "ERROR: log_girsanov_wfwf_r is nan" << std::endl;
+    if (isnan(gir)) {
+        std::cerr << "ERROR: log_girsanov_wfwf_r is NaN" << std::endl;
         std::cerr << "Hm_wt = " << Hm_wt << " Hm_w0 = " << Hm_w0 << " int_mderiv = " << int_mderiv << " int_msquare = " << int_msquare << " int_mtime = " << int_mtime << std::endl;
         exit(1);
     }
@@ -505,7 +505,7 @@ path* cbpMeasure::prop_bridge(double x0, double xt, double t0, double t, std::ve
 		b4_traj.push_back(0);
 		for (i = 0; i < 4; i++) {
 			b4_traj[j] += pow(bb_paths[i]->get_traj(j),2);
-			if (b4_traj[j] != b4_traj[j]) {
+			if (isnan(b4_traj[j])) {
                 std::cerr << "ERROR: Failing to propose a BES4 bridge from " << x0 << " to " << xt << " during time interval (" << t0 << ", " << t << ")" << std::endl;
                 std::cerr << "This likely means that the time vector is getting loopy, possibly due to pileup of points" << std::endl;
                 std::cerr << "The " << i << "th Brownian bridge between " << u[i] << " and " << xt*v[i] << " is faulty:" << std::endl;
