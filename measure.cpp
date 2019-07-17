@@ -510,7 +510,7 @@ path* cbpMeasure::prop_bridge(double x0, double xt, double t0, double t, std::ve
                 std::cerr << "This likely means that the time vector is getting loopy, possibly due to pileup of points" << std::endl;
                 std::cerr << "The " << i << "th Brownian bridge between " << u[i] << " and " << xt*v[i] << " is faulty:" << std::endl;
 				bb_paths[i]->print_traj(std::cerr);
-				bb_paths[i]->print_time(std::cerr << std::setprecision(20));
+				bb_paths[i]->print_time(std::cerr << std::setprecision(10));
 				exit(1);
 			}
 		}

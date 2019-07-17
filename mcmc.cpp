@@ -347,8 +347,8 @@ void mcmc::printState() {
     paramFile << "\t" << curPath->get_firstNonzero();
     paramFile << std::endl;
     trajFile << gen << " ";
-    curPath->print_traj(trajFile << std::setprecision(20));
+    curPath->print_traj(trajFile << std::setprecision(10));
     timeFile << gen << " ";
-    curPath->print_time(timeFile << std::setprecision(20));
+    curPath->print_time(timeFile << std::setprecision(10));
 }
 
