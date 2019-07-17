@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "gzstream.h"
 #include <fstream>
 #include <vector>
 
@@ -51,10 +52,10 @@ private:
 	int gen;
 	int curProp;
     
-    //output files
-    std::ofstream paramFile;
-    std::ofstream trajFile;
-    std::ofstream timeFile;
+    // gzip output files
+    ogzstream paramFile;
+    ogzstream trajFile;
+    ogzstream timeFile;
     
     //output functions
     void prepareOutput(bool infer_age, std::vector<int> time_idx);

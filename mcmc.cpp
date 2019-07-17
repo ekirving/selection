@@ -32,9 +32,9 @@ mcmc::mcmc(settings& mySettings, MbRandom* r) {
 
 void mcmc::no_linked_sites(settings& mySettings) {
 	//open files
-	std::string paramName = mySettings.get_baseName() + ".param";
-	std::string trajName = mySettings.get_baseName() + ".traj";
-	std::string timeName = mySettings.get_baseName() + ".time";
+	std::string paramName = mySettings.get_baseName() + ".param.gz";
+	std::string trajName = mySettings.get_baseName() + ".traj.gz";
+	std::string timeName = mySettings.get_baseName() + ".time.gz";
 	paramFile.open(paramName.c_str());
 	trajFile.open(trajName.c_str());
 	timeFile.open(timeName.c_str());

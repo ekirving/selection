@@ -94,12 +94,28 @@ void path::print_traj(std::ostream& o) {
 	o << std::endl;
 }
 
+void path::print_traj(ogzstream& o) {
+    int i;
+    for (i = 0; i < trajectory.size(); i++) {
+        o << trajectory[i] << " ";
+    }
+    o << std::endl;
+}
+
 void path::print_time(std::ostream& o) {
 	int i;
 	for (i = 0; i < time.size(); i++) {
 		o << time[i] << " ";
 	}
 	o << std::endl;
+}
+
+void path::print_time(ogzstream& o) {
+    int i;
+    for (i = 0; i < time.size(); i++) {
+        o << time[i] << " ";
+    }
+    o << std::endl;
 }
 
 void path::flipCbp() {
@@ -307,6 +323,14 @@ void wfSamplePath::print_traj(std::ostream& o) {
 		o << (1.0-cos(trajectory[i]))/2.0 << " ";
 	}
 	o << std::endl;
+}
+
+void wfSamplePath::print_traj(ogzstream& o) {
+    int i;
+    for (i = 0; i < trajectory.size(); i++) {
+        o << (1.0-cos(trajectory[i]))/2.0 << " ";
+    }
+    o << std::endl;
 }
 
 wfSamplePath::wfSamplePath(std::vector<sample_time*>& st, popsize* p, wfMeasure* wf, settings& s, MbRandom* r) : path() {

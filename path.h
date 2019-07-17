@@ -12,6 +12,7 @@
 #ifndef path_H
 #define path_H
 
+#include "gzstream.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -63,7 +64,9 @@ public:
 	void print(std::ostream& o = std::cout);
 	void print_tsv(std::ostream& o = std::cout);
 	virtual void print_traj(std::ostream& o = std::cout);
+	virtual void print_traj(ogzstream& o);
 	void print_time(std::ostream& o = std::cout);
+    void print_time(ogzstream& o);
 	
 	void set_old_index(int i) {old_index = i;};
 	
@@ -125,6 +128,7 @@ public:
     
 	//print trajectory
 	void print_traj(std::ostream& o = std::cout);
+	void print_traj(ogzstream& o);
 	
 	//popsize
 	popsize* get_pop() {return myPop;};
