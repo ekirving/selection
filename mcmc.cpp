@@ -267,7 +267,7 @@ void mcmc::no_linked_sites(settings& mySettings) {
 				
         
 		if (gen % sampleFreq == 0) {
-            printState();
+            printState(gen % (sampleFreq * 10) == 0); // print path only 1 in 10 times
 		}
 
 	}
@@ -337,7 +337,7 @@ void mcmc::prepareOutput(bool infer_age, std::vector<int> time_idx) {
     paramFile << std::endl;
 }
 
-void mcmc::printState() {
+void mcmc::printState(bool print_path) {
     cbpMeasure testCBP(random);
     double pathlnL = testCBP.log_girsanov_wf_r(curPath, pars[0]->get(), pars[1]->get(), curPath->get_pop(), 0);
     paramFile << gen << "\t" << curlnL << "\t" << pathlnL;
@@ -346,9 +346,11 @@ void mcmc::printState() {
     }
     paramFile << "\t" << curPath->get_firstNonzero();
     paramFile << std::endl;
-    trajFile << gen << " ";
-    curPath->print_traj(trajFile << std::setprecision(10));
-    timeFile << gen << " ";
-    curPath->print_time(timeFile << std::setprecision(10));
+    if (print_path) {
+        trajFile << gen << " ";
+        curPath->print_traj(trajFile << std::setprecision(10));
+        timeFile << gen << " ";
+        curPath->print_time(timeFile << std::setprecision(10));
+    }
 }
 
