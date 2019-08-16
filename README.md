@@ -14,6 +14,11 @@ g++ -O3 *.cpp -lgsl -lgslcblas -lm -lz -o sr
 ```
 may address linker errors.
 
+If running on a different system to the one where you compiled, you may need to set the static flag.
+```
+g++ -O3 *.cpp -static -lgsl -lgslcblas -lm -lz -o sr
+```
+
 ## Generating allele frequency bridges
 
 To generate a bridge, following the logic of Schraiber et al (2013), use the flag -b, followed by a comma separated list,
