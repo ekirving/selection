@@ -119,7 +119,7 @@ void mcmc::no_linked_sites(settings& mySettings) {
     propChance.push_back(mySettings.get_ageprop()); //update start/age
 	propChance.push_back(mySettings.get_endprop()); //update end
     for (int i = 0; i < time_idx.size(); i++) {
-        propChance.push_back(mySettings.get_timeprop()); //update times
+        propChance.push_back(mySettings.get_timeprop() / time_idx.size()); //update times
     }
 	propChance.push_back(mySettings.get_pathprop()); //update path
 
