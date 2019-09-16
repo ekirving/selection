@@ -18,11 +18,12 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <algorithm>
 
 settings::settings(int argc, char* const argv[]) {
 	
 	//define defaults
-	max_dt = 0.0001;
+	max_dt = 0.001;
 	min_grid = 10;
 	bridge = 0;
 	mcmc = 0;
@@ -44,9 +45,10 @@ settings::settings(int argc, char* const argv[]) {
 	output_tsv = 0;
     a1prop = 2.0;
     a2prop = 2.0;
+    fprop = 1.0;
     ageprop = 10.0;
     endprop = 5.0;
-    timeprop = 5.0;
+    timeprop = 0.5;
     pathprop = 10.0;
     a1start = 25.0;
     a2start = 50.0;
@@ -56,6 +58,8 @@ settings::settings(int argc, char* const argv[]) {
     N0 = 0.5;
     h = 0.5;
     fix_h = false;
+    min_freq = 0;
+    ascertain = false;
 
 	//read the parameters
 	int ac = 1;
@@ -159,6 +163,11 @@ settings::settings(int argc, char* const argv[]) {
                 inputFile = argv[ac+1];
                 ac += 2;
                 break;
+            case 'A':
+                ascertain = true;
+                min_freq = atof(argv[ac+1]);
+                ac += 2;
+                break;
 		}
 	}
 }
@@ -173,8 +182,8 @@ std::vector<double> settings::parse_bridge_pars() {
 		pars.push_back(atof(cur_par.c_str()));
 	}
 	if (pars.size() < 4) {
-		std::cout << "ERROR: Not enough bridge parameters" << std::endl;
-		std::cout << "Only " << pars.size() << " specified; 4 are required" << std::endl;
+		std::cerr << "ERROR: Not enough bridge parameters" << std::endl;
+		std::cerr << "Only " << pars.size() << " specified; 4 are required" << std::endl;
 		exit(1);
 	}
 	return pars;
@@ -192,7 +201,7 @@ void settings::print() {
 		std::cout << "gamma\t" << pars[2] << std::endl;
 		std::cout << "t\t" << pars[3] << std::endl;
 	} else if (mcmc) {
-		std::cout << "num_gen\t" << num_gen << std::endl;
+		std::cerr << "num_gen\t" << num_gen << std::endl;
 		if (linked_sites) {
 			//file destinations
 		} else {
@@ -203,8 +212,8 @@ void settings::print() {
 
 popsize* settings::parse_popsize_file() {
     if (popFile == "") {
-    std::cout << "ERROR: No population size history specified! Use -P option" << std::endl;
-    exit(1);
+        std::cerr << "ERROR: No population size history specified! Use -P option" << std::endl;
+        exit(1);
     }
     
     
@@ -240,11 +249,11 @@ std::vector<sample_time*> settings::parse_input_file(MbRandom* r) {
         std::istringstream curLine(curLineString);
         curLine >> curCount >> curSS >> curLowTime >> curHighTime;
         if (curCount < 0 || curCount > curSS) {
-            std::cout << "Allele count is not between 0 and sample size: X = " << curCount << ", SS = " << curSS << std::endl;
+            std::cerr << "ERROR: Allele count is not between 0 and sample size: X = " << curCount << ", SS = " << curSS << std::endl;
             exit(1);
         }
         if (curLowTime > curHighTime) {
-            std::cout << "Low end of time range higher than high end: t_low = " << curLowTime << ", t_high = " << curHighTime << std::endl;
+            std::cerr << "ERROR: Low end of time range higher than high end: t_low = " << curLowTime << ", t_high = " << curHighTime << std::endl;
             exit(1);
         }
         //Convert time units
@@ -264,7 +273,7 @@ std::vector<sample_time*> settings::parse_input_file(MbRandom* r) {
     //check that most recent time point is fixed
     int num_sam = sample_time_vec.size();
     if (sample_time_vec[num_sam-1]->get_oldest()<sample_time_vec[num_sam-1]->get_youngest()) {
-        std::cout << "ERROR: most recent time point must have no uncertainty" << std::endl;
+        std::cerr << "ERROR: most recent time point must have no uncertainty" << std::endl;
         exit(1);
     }
 

@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include "gzstream.h"
 #include <fstream>
 #include <vector>
 
@@ -18,6 +19,7 @@ class wienerMeasure;
 class MbRandom;
 class settings;
 class param;
+class sample_time;
 
 class mcmc {
 
@@ -44,18 +46,21 @@ private:
 	double compute_lnL(wfSamplePath* p, measure* m, wienerMeasure* wm);
 	
 	double compute_lnL_sample_only(wfSamplePath* p);
+    
+    double ascertain(wfSamplePath* p);
 	
 	int gen;
 	int curProp;
     
-    //output files
-    std::ofstream paramFile;
-    std::ofstream trajFile;
-    std::ofstream timeFile;
+    // gzip output files
+    ogzstream paramFile;
+    ogzstream trajFile;
+    ogzstream timeFile;
     
     //output functions
     void prepareOutput(bool infer_age, std::vector<int> time_idx);
-    void printState();
+    void printState(bool print_path);
 	
-	
+    bool doAscertain;
+    int minCount; 
 };

@@ -5,14 +5,19 @@
 This software is written in C++ and requires the GNU scientific library to run. Download all the files and compile with
 
 ```
-g++ -O3 -lgsl *.cpp -o sr
+g++ -O3 -lgsl -lz *.cpp -o sr
 ```
 On some systems such as gcc, the order of arguments matters, in which case
 compiling with
 ```
-g++ -O3 *.cpp -lgsl -lgslcblas -lm -o sr
+g++ -O3 *.cpp -lgsl -lgslcblas -lm -lz -o sr
 ```
 may address linker errors.
+
+If running on a different system to the one where you compiled, you may need to set the static flag.
+```
+g++ -O3 *.cpp -static -lgsl -lgslcblas -lm -lz -o sr
+```
 
 ## Generating allele frequency bridges
 

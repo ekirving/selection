@@ -22,7 +22,7 @@ mcmc::mcmc(settings& mySettings, MbRandom* r) {
 	printFreq = mySettings.get_printFreq();
 	sampleFreq = mySettings.get_sampleFreq();
 	num_gen = mySettings.get_num_gen();
-	minUpdate = mySettings.get_grid();
+	minUpdate = mySettings.getMinUpdate();
 	if (!mySettings.get_linked()) {
 		no_linked_sites(mySettings);
 	} else {
@@ -32,16 +32,16 @@ mcmc::mcmc(settings& mySettings, MbRandom* r) {
 
 void mcmc::no_linked_sites(settings& mySettings) {
 	//open files
-	std::string paramName = mySettings.get_baseName() + ".param";
-	std::string trajName = mySettings.get_baseName() + ".traj";
-	std::string timeName = mySettings.get_baseName() + ".time";
+	std::string paramName = mySettings.get_baseName() + ".param.gz";
+	std::string trajName = mySettings.get_baseName() + ".traj.gz";
+	std::string timeName = mySettings.get_baseName() + ".time.gz";
 	paramFile.open(paramName.c_str());
 	trajFile.open(trajName.c_str());
 	timeFile.open(timeName.c_str());
 	
 	//initialize wfMeasure
 	wfMeasure* curWF = new wfMeasure(random,0);
-	wfMeasure* oldWF = NULL;
+	//wfMeasure* oldWF = NULL;
 	curWF->set_num_test(mySettings.get_num_test());
 		    
     //parse the settings
@@ -57,6 +57,9 @@ void mcmc::no_linked_sites(settings& mySettings) {
 	
 	param_path* curParamPath = new param_path(curPath,alpha1,alpha2,random,mySettings);
     
+    param_F* cur_F = new param_F(0.1,random);
+    curPath->set_F(cur_F);
+    
     start_freq* start;
     param_age* age;
     if (!mySettings.get_infer_age()) {
@@ -71,11 +74,14 @@ void mcmc::no_linked_sites(settings& mySettings) {
         curPath->set_old_index(-1);
     }
     
+
+    
 	
 	//initialize the parameter vector
     pars.resize(0);
 	pars.push_back(alpha1);
 	pars.push_back(alpha2);
+    pars.push_back(cur_F);
     if (!mySettings.get_infer_age()) {
         pars.push_back(start);
     } else {
@@ -86,7 +92,7 @@ void mcmc::no_linked_sites(settings& mySettings) {
     for (int i = 0; i < sample_time_vec.size()-1; i++) {
         if (sample_time_vec[i]->get_oldest() < sample_time_vec[i]->get_youngest()) {
             if (!mySettings.get_infer_age()) {
-                std::cout << "ERROR: Cannot have uncertain times without inferring allele age. Will be fixed in the future" << std::endl;
+                std::cerr << "ERROR: Cannot have uncertain times without inferring allele age. Will be fixed in the future" << std::endl;
                 exit(1);
             }
             sample_time_vec[i]->set_path(curParamPath);
@@ -105,10 +111,11 @@ void mcmc::no_linked_sites(settings& mySettings) {
 	std::vector<double> propChance(0);
 	propChance.push_back(mySettings.get_a1prop()); //update alpha1
 	propChance.push_back(mySettings.get_a2prop()); //update alpha2
-	propChance.push_back(mySettings.get_ageprop()); //update start/age
+    propChance.push_back(mySettings.get_fprop()); //update F
+    propChance.push_back(mySettings.get_ageprop()); //update start/age
 	propChance.push_back(mySettings.get_endprop()); //update end
     for (int i = 0; i < time_idx.size(); i++) {
-        propChance.push_back(mySettings.get_timeprop()); //update times
+        propChance.push_back(mySettings.get_timeprop() / time_idx.size()); //update times
     }
 	propChance.push_back(mySettings.get_pathprop()); //update path
 
@@ -123,11 +130,23 @@ void mcmc::no_linked_sites(settings& mySettings) {
 		propChance[i] = cumsum;
 	}
     
+    //determine if ascertained
+    doAscertain = mySettings.get_ascertain();
+    
+    if (doAscertain) {
+        double ssModern = sample_time_vec[sample_time_vec.size()-1]->get_ss();
+        minCount = ceil(mySettings.get_min_freq()*ssModern);
+        std::cout << "Modeling ascertainment, assuming at least " << minCount << " copies of the derived allele at present and derived allele found in at least one ancient sample" << std::endl;
+    }
+    
+    //clean up
+    
+    delete curWF;
     
 	
 	//compute starting lnL
 	curlnL = compute_lnL_sample_only(curPath);
-	
+    
 	//run mcmc
 	for (gen = 0; gen < num_gen; gen++) {
 
@@ -141,7 +160,8 @@ void mcmc::no_linked_sites(settings& mySettings) {
 				break;
 			}
 		}
-                
+        
+        //do the hard work
 		pars[curProp]->increaseProp();
 		propRatio = pars[curProp]->propose();
 		priorRatio = pars[curProp]->prior();
@@ -149,18 +169,24 @@ void mcmc::no_linked_sites(settings& mySettings) {
         if (mySettings.get_fix_h() && curProp == 1) {
             pars[0]->setNew(pars[1]->get()*mySettings.get_h());
         }
-			
-		oldWF = curWF;
-		curWF = new wfMeasure(random,pars[0]->get());
-		oldlnL = curlnL;
+		
+        //TODO: DOES THIS DO ANYTHING??????
+		//oldWF = curWF;
+		//curWF = new wfMeasure(random,pars[0]->get());
+		
+        oldlnL = curlnL;
 		curlnL = compute_lnL_sample_only(curPath);
 		
 		double LLRatio = curlnL-oldlnL;
-        if (curlnL != curlnL || oldlnL != oldlnL) {
-            std::cout << "ERROR: likelihood is nan!" << std::endl;
-            std::cout << "Generation = " << gen << std::endl;
-            std::cout << "Proposal = " << curProp << std::endl;
-            std::cout << "curlnL = " << curlnL << ", oldlnL = " << oldlnL << std::endl;
+        if (isnan(curlnL) || isnan(oldlnL)) {
+            std::cerr << "ERROR: likelihood is NaN!" << std::endl;
+            std::cerr << "Generation = " << gen << std::endl;
+            std::cerr << "Proposal = " << curProp << std::endl;
+            std::cerr << "curlnL = " << curlnL << ", oldlnL = " << oldlnL << std::endl;
+            curPath->print();
+            for (int t = 0; t < sample_time_vec.size(); t++) {
+                std::cerr << sample_time_vec[t]->get() << std::endl;
+            }
             exit(1);
         }
 		if (curProp == 0 || curProp == 1) {
@@ -170,9 +196,6 @@ void mcmc::no_linked_sites(settings& mySettings) {
 		}
 		double mh = LLRatio+propRatio+priorRatio;
 		u = random->uniformRv();
-       
-//        std::cout << "Current length of path is " << curPath->get_length() << " or " << curPath->get_length_time() << std::endl;
-//        std::cout << "Current start and end of path are " << curPath->get_time(0) << " and " << curPath->get_time(curPath->get_length()-1) << std::endl;
         
         if (gen % printFreq == 0) {
             std::cout << gen << " " << curProp;
@@ -186,7 +209,7 @@ void mcmc::no_linked_sites(settings& mySettings) {
 			}
 			curPath->set_update_begin(0);
 			curPath->set_old_index(-1);
-			delete oldWF;
+			//delete oldWF;
 			state = "Accept";
 		} else {
 			//reject
@@ -198,8 +221,8 @@ void mcmc::no_linked_sites(settings& mySettings) {
                 pars[0]->reset();
             }
 			
-			delete curWF;
-			curWF = oldWF;
+			//delete curWF;
+			//curWF = oldWF;
 			curlnL = oldlnL;
 			state = "Reject";
 		}
@@ -213,13 +236,15 @@ void mcmc::no_linked_sites(settings& mySettings) {
         for (int i = 0; i < sample_time_vec.size(); i++) {
             double curTime = sample_time_vec[i]->get();
             int curIdx = sample_time_vec[i]->get_idx();
-            double curTimePath = curPath->get_time(curIdx);
-            if (curTime != curTimePath && curIdx != -1) {
-                std::cout << "ERROR: sample time index for time " << i << " is lost!" << std::endl;
-                std::cout << "curTime = " << curTime << std::endl;
-                std::cout << "curIdx = " << curIdx << std::endl;
-                std::cout << "curTimePath = " << curTimePath << std::endl;
-                exit(1);
+            if (curIdx != -1) {
+                double curTimePath = curPath->get_time(curIdx);
+                if (curTime != curTimePath && curIdx != -1) {
+                    std::cerr << "ERROR: sample time index for time " << i << " is lost!" << std::endl;
+                    std::cerr << "curTime = " << curTime << std::endl;
+                    std::cerr << "curIdx = " << curIdx << std::endl;
+                    std::cerr << "curTimePath = " << curTimePath << std::endl;
+                    exit(1);
+                }
             }
         }
 		
@@ -238,12 +263,14 @@ void mcmc::no_linked_sites(settings& mySettings) {
 				
         
 		if (gen % sampleFreq == 0) {
-            printState();
+            printState(gen % (sampleFreq * 10) == 0); // print path only 1 in 10 times
 		}
-//       std::cout << "Current length of path is " << curPath->get_length() << " or " << curPath->get_length_time() << std::endl;
-//       std::cout << "Current start and end of path are " << curPath->get_time(0) << " and " << curPath->get_time(curPath->get_length()-1) << std::endl;
 
 	}
+    paramFile.close();
+    trajFile.close();
+    timeFile.close();
+   
 
 }
 
@@ -258,10 +285,10 @@ double mcmc::compute_lnL(wfSamplePath* p, measure* m, wienerMeasure* wm) {
 		sample_prob += p->sampleProb(i);
 	}
 	
-	if (gir != gir) {
-		std::cout << "Likelihood is nan at generation " << gen << ". Proposal " << curProp << std::endl;
-		p->print_traj(std::cout);
-		p->print_time(std::cout);
+	if (isnan(gir)) {
+		std::cerr << "ERROR: Likelihood is NaN at generation " << gen << ". Proposal " << curProp << std::endl;
+		p->print_traj(std::cerr);
+		p->print_time(std::cerr);
 		exit(1);
 	}
 	return gir + sample_prob;
@@ -272,12 +299,27 @@ double mcmc::compute_lnL_sample_only(wfSamplePath* p) {
 	for (int i = 0; i < p->get_num_samples(); i++) {
 		sample_prob += p->sampleProb(i);
 	}
+    
+    if (sample_prob == -INFINITY) {
+        return -INFINITY;
+    }
+    
+    if (doAscertain) {
+        sample_prob -= ascertain(p);
+    }
 	
 	return sample_prob;
 }
 
+double mcmc::ascertain(wfSamplePath* p) {
+    double pA = 0;
+    pA += p->ascertainModern(minCount);
+    pA += p->ascertainAncient();
+    return pA;
+}
+
 void mcmc::prepareOutput(bool infer_age, std::vector<int> time_idx) {
-    paramFile << "gen\tlnL\tpathlnL\talpha1\talpha2";
+    paramFile << "gen\tlnL\tpathlnL\talpha1\talpha2\tF";
     if (infer_age) {
         paramFile << "\tage";
     } else {
@@ -291,7 +333,7 @@ void mcmc::prepareOutput(bool infer_age, std::vector<int> time_idx) {
     paramFile << std::endl;
 }
 
-void mcmc::printState() {
+void mcmc::printState(bool print_path) {
     cbpMeasure testCBP(random);
     double pathlnL = testCBP.log_girsanov_wf_r(curPath, pars[0]->get(), pars[1]->get(), curPath->get_pop(), 0);
     paramFile << gen << "\t" << curlnL << "\t" << pathlnL;
@@ -300,9 +342,11 @@ void mcmc::printState() {
     }
     paramFile << "\t" << curPath->get_firstNonzero();
     paramFile << std::endl;
-    trajFile << gen << " ";
-    curPath->print_traj(trajFile << std::setprecision(20));
-    timeFile << gen << " ";
-    curPath->print_time(timeFile << std::setprecision(20));
+    if (print_path) {
+        trajFile << gen << " ";
+        curPath->print_traj(trajFile << std::setprecision(10));
+        timeFile << gen << " ";
+        curPath->print_time(timeFile << std::setprecision(10));
+    }
 }
 

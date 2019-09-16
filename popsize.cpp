@@ -49,17 +49,17 @@ popsize::popsize(settings& s) {
 	for (int i = 0; i < sizes.size()-1; i++) {
 		//the times better be in decreasing order!
 		if (times[i] <= times[i+1]) {
-			std::cout << "ERROR: Times are not in decreasing order!" << std::endl;
-			std::cout << "Time " << i << " <= Time " << i+1 << std::endl;
-			std::cout << times[i] << " <= " << times[i+1] << std::endl;
+			std::cerr << "ERROR: Times are not in decreasing order!" << std::endl;
+			std::cerr << "Time " << i << " <= Time " << i+1 << std::endl;
+			std::cerr << times[i] << " <= " << times[i+1] << std::endl;
 			exit(1);
 		}
 	}
 	//the last thing better be infinity, and not change
 	if (times[times.size()-1] !=-INFINITY || rates[rates.size()-1] != 0) {
-		std::cout << "ERROR: Final time point is not infinity OR final epoch not constant" << std::endl;
-		std::cout << "Size Rate Time" << std::endl;
-		std::cout << sizes[sizes.size()-1] << " " << rates[rates.size()-1] << " " << times[times.size()-1] << std::endl;
+		std::cerr << "ERROR: Final time point is not infinity OR final epoch not constant" << std::endl;
+		std::cerr << "Size Rate Time" << std::endl;
+		std::cerr << sizes[sizes.size()-1] << " " << rates[rates.size()-1] << " " << times[times.size()-1] << std::endl;
 		exit(1);
 	}
 	computeT();

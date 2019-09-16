@@ -49,6 +49,7 @@ public:
 	bool get_output_tsv() {return output_tsv;};
     double get_a1prop() {return a1prop;};
     double get_a2prop() {return a2prop;};
+    double get_fprop() {return fprop;};
     double get_ageprop() {return ageprop;};
     double get_endprop() {return endprop;};
     double get_timeprop() {return timeprop;};
@@ -62,6 +63,8 @@ public:
     std::string get_infile() {return inputFile;};
     double get_h() {return h;};
     bool get_fix_h() {return fix_h;};
+    bool get_ascertain() {return ascertain;};
+    double get_min_freq() {return min_freq;};
 		
 	//parse things
 	std::vector<double> parse_bridge_pars();
@@ -91,6 +94,7 @@ private:
 	int output_tsv; //whether to output -b in tsv format
     double a1prop;
     double a2prop;
+    double fprop;
     double ageprop;
     double endprop;
     double pathprop;
@@ -104,6 +108,8 @@ private:
     std::string inputFile;
     double h;
     bool fix_h;
+    double min_freq;
+    bool ascertain;
 };
 
 

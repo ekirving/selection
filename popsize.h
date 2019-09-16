@@ -36,9 +36,9 @@ public:
 	std::vector<double> getBreakTimes(double t0, double t);
 	
 	//get an entry of the vectors
-	double getSizes(int i) {return sizes[i];};
-	double getRates(int i) {return rates[i];};
-	double getTimes(int i) {return times[i];};
+	double getSizes(int i) {return sizes.at(i);};
+	double getRates(int i) {return rates.at(i);};
+	double getTimes(int i) {return times.at(i);};
 	
 	
 private:
