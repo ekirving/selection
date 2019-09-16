@@ -45,9 +45,10 @@ settings::settings(int argc, char* const argv[]) {
 	output_tsv = 0;
     a1prop = 2.0;
     a2prop = 2.0;
+    fprop = 1.0;
     ageprop = 10.0;
     endprop = 5.0;
-    timeprop = 5.0;
+    timeprop = 0.5;
     pathprop = 10.0;
     a1start = 25.0;
     a2start = 50.0;

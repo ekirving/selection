@@ -158,9 +158,9 @@ void path::modify(path* p, int i) {
 			old_time.push_back(time[i+j]);
             //old_time[j] = time[i+j];
 			time[i+j] = p->get_time(j);
-            if (time[i+j] < time[i+j-1]) {
+            if (i+j > 0 && time.at(i+j) < time.at(i+j-1)) {
                 std::cerr << "ERROR: time vector is not sorted!" << std::endl;
-                std::cerr << time[i+j] << " >= " << time[i+j-1] << std::endl;
+                std::cerr << time[i+j] << " < " << time[i+j-1] << std::endl;
                 exit(1);
             }
 		}

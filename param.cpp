@@ -26,10 +26,10 @@ void param::updateTuning() {
 		if (.01 < scaleFactor) {
 			scaleFactor = .01;
 		}
-		if (curAccept > .3) {
-			tuning = exp(log(tuning)+scaleFactor);
-		} else {
-			tuning = exp(log(tuning)-scaleFactor);
+		if (curAccept > 0.234) {
+            tuning = exp(log(tuning) + scaleFactor);
+        } else {
+			tuning = exp(log(tuning) - scaleFactor);
 		}
         if (tuning < minTuning) {
             tuning = minTuning;

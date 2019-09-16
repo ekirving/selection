@@ -22,7 +22,7 @@ mcmc::mcmc(settings& mySettings, MbRandom* r) {
 	printFreq = mySettings.get_printFreq();
 	sampleFreq = mySettings.get_sampleFreq();
 	num_gen = mySettings.get_num_gen();
-	minUpdate = mySettings.get_grid();
+	minUpdate = mySettings.getMinUpdate();
 	if (!mySettings.get_linked()) {
 		no_linked_sites(mySettings);
 	} else {
@@ -111,11 +111,7 @@ void mcmc::no_linked_sites(settings& mySettings) {
 	std::vector<double> propChance(0);
 	propChance.push_back(mySettings.get_a1prop()); //update alpha1
 	propChance.push_back(mySettings.get_a2prop()); //update alpha2
-    
-    ////////////////////LOOK HERE/////////////////////////
-    propChance.push_back(mySettings.get_a2prop()); //update F TODO: THIS DOESN'T HAVE ITS OWN THING
-	///////////////////LOOK HERE/////////////////////////
-    
+    propChance.push_back(mySettings.get_fprop()); //update F
     propChance.push_back(mySettings.get_ageprop()); //update start/age
 	propChance.push_back(mySettings.get_endprop()); //update end
     for (int i = 0; i < time_idx.size(); i++) {
