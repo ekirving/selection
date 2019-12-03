@@ -48,7 +48,7 @@ settings::settings(int argc, char* const argv[]) {
     fprop = 1.0;
     ageprop = 10.0;
     endprop = 5.0;
-    timeprop = 0.5;
+    timeprop = 1.0;
     pathprop = 10.0;
     a1start = 25.0;
     a2start = 50.0;
