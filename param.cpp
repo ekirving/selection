@@ -428,7 +428,7 @@ std::vector<double> param_path::make_time_vector(double newAge, int end_index, p
 //updates from the end
 double param_path::proposeEnd(double newEnd) {
 	int end_index = curPath->get_length()-1;
-	int start_index = end_index - (minUpdate+curPath->get_length()/fracOfPath)+1;
+    int start_index = end_index - minUpdate;
 	double x0 = curPath->get_traj(start_index);
 	double xt = newEnd;
 	double t0 = curPath->get_time(start_index);

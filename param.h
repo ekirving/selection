@@ -130,7 +130,7 @@ private:
 class end_freq: public param {
 public:
 	//SEE ABOVE!
-    end_freq(double x, MbRandom* r, param_path* p): param(x, r) {curParamPath = p; minTuning=3.14/500.;};
+    end_freq(double x, MbRandom* r, param_path* p): param(x, r) {curParamPath = p; tuning=3.14/100.; minTuning=3.14/500.;};
 	double propose();
 	double prior();
     
