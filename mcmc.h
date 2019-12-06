@@ -59,7 +59,7 @@ private:
     
     //output functions
     void prepareOutput(bool infer_age, std::vector<int> time_idx);
-    void printState(bool print_path);
+    void printState();
 	
     bool doAscertain;
     int minCount; 
