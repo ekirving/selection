@@ -303,9 +303,8 @@ double param_path::proposeAlleleAge(double newAge, double oldAge) {
         while (curPath->get_time(end_index) < newAge) {
             end_index++;
         }
-        if (end_index + 2*minUpdate < curPath->get_length()) {
-            end_index += 2*minUpdate;
-        }
+        end_index = std::min(end_index + 2*minUpdate, int(curPath->get_length()) - 1);
+
         if (end_index > curPath->get_length()) {
             std::cerr << "ERROR: trying to update allele age path past the end of the path!" << std::endl;
             std::cerr << "path length = " << curPath->get_length() << ", end_index = " << end_index << std::endl;
