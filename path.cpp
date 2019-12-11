@@ -401,7 +401,7 @@ wfSamplePath::wfSamplePath(std::vector<sample_time*>& st, popsize* p, wfMeasure*
         //make sure the time vector includes all the break points
         curStart = breakPoints[curBreak];
         curEnd = breakPoints[curBreak+1];
-        int steps = (curEnd-curStart)/dt+1;
+        int steps = (curEnd-curStart)/s.get_dt()+1;
         if (steps < min_steps) {
             steps = min_steps;
         }
