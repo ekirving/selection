@@ -244,7 +244,11 @@ double wfSamplePath::sampleProb(int k, int n, double y) {
     double sp = 0;
     //get the actual frequency
     double p = (1.0-cos(y))/2.0;
-    if (F->get() == 0) {
+    if (p == 0) {
+        if (k != 0) {
+            sp += -INFINITY;
+        }
+    } else if (F->get() == 0) {
         //binomial
         sp += lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);
         sp += k*log(p);
@@ -266,7 +270,7 @@ double wfSamplePath::sampleProb(int i) {
     double ss = sample_time_vec[i]->get_ss();
 	double sp = 0;
 	if (idx != -1 && idx != 0) {
-        sp += sampleProb(sc,ss,trajectory[idx]);
+        sp += sampleProb(sc,ss,trajectory.at(idx));
 	} else {
 		if (sc == 0) {
 			sp += 0;
@@ -282,7 +286,7 @@ double wfSamplePath::ascertainModern(int min) {
     double ss = sample_time_vec[sample_time_vec.size()-1]->get_ss();
     double pA = 0;
     for (int k = min; k < ss; k++) {
-        pA += exp(sampleProb(k, ss, trajectory[idx]));
+        pA += exp(sampleProb(k, ss, trajectory.at(idx)));
     }
     return log(pA);
 }
@@ -294,7 +298,7 @@ double wfSamplePath::ascertainAncient() {
         double ss = sample_time_vec[i]->get_ss();
         if (idx > 0) {
             //P(current time has 0 derived alleles)
-            pNone += sampleProb(0,ss,trajectory[idx]);
+            pNone += sampleProb(0,ss,trajectory.at(idx));
         } else {
             pNone += 0;
         }
