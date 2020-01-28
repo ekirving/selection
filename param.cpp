@@ -95,21 +95,12 @@ double param_F::propose() {
 }
 
 double start_freq::propose() {
-	oldVal = curVal;
-    
-    double propRatio = 0;
-    
-    //OLD: truncated normal
-	//curVal = random->truncatedNormalRv(0, PI, oldVal, tuning);
-	//double propRatio = random->truncatedNormalPdf(0, PI, curVal, tuning, oldVal);
-	//propRatio -= random->truncatedNormalPdf(0, PI, oldVal, tuning, curVal);
-    
+    //truncated normal
+    oldVal = curVal;
+    curVal = random->truncatedNormalRv(0, PI, oldVal, tuning);
+    double propRatio = random->truncatedNormalPdf(0, PI, curVal, tuning, oldVal);
+    propRatio -= random->truncatedNormalPdf(0, PI, oldVal, tuning, curVal);
     propRatio += curParamPath->proposeStart(curVal);
-
-    //NEW: reflected uniform
-    curVal = reflectedUniform(oldVal, tuning, 0, PI);
-    propRatio += 0;
-	
     return propRatio;
 }
 
@@ -283,7 +274,7 @@ double param_path::propose() {
 //updates from the beginning
 double param_path::proposeStart(double newStart) {
 	int start_index = 0;
-	int end_index = start_index + minUpdate+curPath->get_length()/fracOfPath;
+	int end_index = start_index + minUpdate;
 	double x0 = newStart;
 	double xt = curPath->get_traj(end_index);
 	double t0 = curPath->get_time(start_index);
