@@ -117,7 +117,7 @@ private:
 //NB: even though it says "freq", this really the transformed frequency
 class start_freq: public param {
 public:
-    start_freq(double x, MbRandom* r, param_path* p): param(x, r) {curParamPath = p; minTuning=0.0;};
+    start_freq(double x, MbRandom* r, param_path* p): param(x, r) {curParamPath = p; tuning=3.14/100.; minTuning=3.14/500.;};
 	double propose();
 	double prior();
     

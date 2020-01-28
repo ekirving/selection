@@ -269,7 +269,7 @@ double wfSamplePath::sampleProb(int i) {
     double sc = sample_time_vec[i]->get_sc();
     double ss = sample_time_vec[i]->get_ss();
 	double sp = 0;
-	if (idx != -1 && idx != 0) {
+	if (idx != -1) {
         sp += sampleProb(sc,ss,trajectory.at(idx));
 	} else {
 		if (sc == 0) {
@@ -393,7 +393,9 @@ wfSamplePath::wfSamplePath(std::vector<sample_time*>& st, popsize* p, wfMeasure*
     
     int cur_time_idx = 1;
     int startBreak = 0;
-    if (breakPoints[0] != sample_time_vec[0]->get()) {
+    if (breakPoints[0] == sample_time_vec[0]->get()) {
+        sample_time_vec[0]->set_idx(0);
+    } else {
         startBreak = 1;
     }
     std::vector<double> time_vec;
