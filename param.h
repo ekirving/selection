@@ -24,7 +24,7 @@ class param {
 	
 public:
     param(MbRandom* r) {curVal = 0; oldVal = 0; tuning = 1; random = r; numProp = 0; numTunings = 0; numAccept = 0; minTuning = 0;};
-    param(double x, MbRandom* r) {curVal = x; random = r; oldVal = x; tuning = 1; numTunings = 0; numProp = 0; numAccept = 0; minTuning = 0;}
+    param(double x, MbRandom* r) {curVal = x; random = r; oldVal = x; tuning = 1; numTunings = 0; numProp = 0; numAccept = 0; minTuning = 0; maxTuning = 0;}
     ~param() {};
 	virtual double propose() = 0; //return proposal ratio!
 	virtual double prior() = 0; //return prior ratio!
@@ -44,6 +44,7 @@ protected:
 	double oldVal;
 	double tuning;
     double minTuning;
+    double maxTuning;
 	int numProp;
 	int numAccept;
 	int numTunings;
@@ -77,7 +78,7 @@ private:
 
 class param_F: public param {
 public:
-    param_F(double x, MbRandom* r): param(x, r) {tuning = 0.5; minTuning = 0.0;};
+    param_F(double x, MbRandom* r): param(x, r) {tuning = 0.5; minTuning = 0.0; maxTuning = 1.0;};
     double propose();
     double prior();
     

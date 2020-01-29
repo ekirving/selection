@@ -33,6 +33,8 @@ void param::updateTuning() {
 		}
         if (tuning < minTuning) {
             tuning = minTuning;
+        } else if (maxTuning > 0 && tuning > maxTuning) {
+            tuning = maxTuning;
         }
 	}
 	numAccept = 0;
