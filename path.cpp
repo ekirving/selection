@@ -248,6 +248,10 @@ double wfSamplePath::sampleProb(int k, int n, double y) {
         if (k != 0) {
             sp += -INFINITY;
         }
+    } else if (p == 1) {
+        if (k != n) {
+            sp += -INFINITY;
+        }
     } else if (F->get() == 0) {
         //binomial
         sp += lgamma(n+1)-lgamma(k+1)-lgamma(n-k+1);
